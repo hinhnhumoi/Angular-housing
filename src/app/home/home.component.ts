@@ -1,8 +1,9 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { HousingLocationComponent } from '../housing-location/housing-location.component';
 import { HousingLocation } from '../housinglocation';
 import { CommonModule } from '@angular/common';
 import { HousingService } from '../housing.service';
+import { Subscription } from 'rxjs';
 
 
 @Component({
@@ -12,13 +13,15 @@ import { HousingService } from '../housing.service';
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })
-export class HomeComponent implements OnInit{
+export class HomeComponent implements OnInit, OnDestroy{
 
   housingLocationList: HousingLocation[] = [];
 
   housingService: HousingService = inject(HousingService);
 
   filteredLocationList: HousingLocation[] = [];
+
+  housingSubscription : Subscription | undefined;
 
   ngOnInit() {
     this.housingService.getAllHousingLocations().subscribe({
@@ -31,6 +34,11 @@ export class HomeComponent implements OnInit{
 
 
   constructor() {
+  }
+  ngOnDestroy(): void {
+    if(this.housingSubscription) {
+      this.housingSubscription.unsubscribe();
+    }
   }
 
   filterResults(text: string) {
